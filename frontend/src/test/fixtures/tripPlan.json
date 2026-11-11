@@ -1,0 +1,1331 @@
+{
+ "departure": "2026-11-10T13:00:00Z",
+ "load_pounds": 42000.0,
+ "interval_miles": 50,
+ "recommended_route_id": "C",
+ "recommendation_reason": "Route C recommended: 103.5 fewer No Travel miles than Route A.",
+ "warnings": [
+  "Route C crosses 146.5 mi of No Travel conditions.",
+  "Route A crosses 250.0 mi of No Travel conditions.",
+  "Route B crosses 350.0 mi of No Travel conditions.",
+  "Every route includes No Travel conditions. Consider delaying departure."
+ ],
+ "routes": [
+  {
+   "route_id": "C",
+   "provider": "stub",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      -104.9903,
+      39.7392
+     ],
+     [
+      -104.43706,
+      39.50813
+     ],
+     [
+      -103.89894,
+      39.26473
+     ],
+     [
+      -103.37593,
+      39.00901
+     ],
+     [
+      -102.86803,
+      38.74097
+     ],
+     [
+      -102.37525,
+      38.46062
+     ],
+     [
+      -101.89758,
+      38.16794
+     ],
+     [
+      -101.43502,
+      37.86293
+     ],
+     [
+      -100.98757,
+      37.54561
+     ],
+     [
+      -100.55523,
+      37.21597
+     ],
+     [
+      -100.13801,
+      36.874
+     ],
+     [
+      -99.7359,
+      36.51972
+     ],
+     [
+      -99.34891,
+      36.15311
+     ],
+     [
+      -98.97703,
+      35.77418
+     ],
+     [
+      -98.62026,
+      35.38294
+     ],
+     [
+      -98.2786,
+      34.97937
+     ],
+     [
+      -97.95205,
+      34.56347
+     ],
+     [
+      -97.64062,
+      34.13526
+     ],
+     [
+      -97.3443,
+      33.69473
+     ],
+     [
+      -97.06309,
+      33.24188
+     ],
+     [
+      -96.797,
+      32.7767
+     ],
+     [
+      -96.797,
+      32.7767
+     ]
+    ]
+   },
+   "summary": {
+    "distance_miles": 793.0,
+    "duration_seconds": 49223.0,
+    "miles_by_level": {
+     "Low": 525.0,
+     "Moderate": 50.0,
+     "High": 0.0,
+     "Severe": 71.5,
+     "No Travel": 146.5
+    },
+    "unknown_miles": 0.0,
+    "average_risk_score": 1.07,
+    "highest_risk_level": "No Travel"
+   },
+   "checkpoints": [
+    {
+     "sequence": 0,
+     "latitude": 39.7392,
+     "longitude": -104.9903,
+     "distance_from_origin_miles": 0.0,
+     "represented_miles": 25.0,
+     "estimated_arrival": "2026-11-10T13:00:00Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 1,
+     "latitude": 39.44453,
+     "longitude": -104.2924,
+     "distance_from_origin_miles": 50.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T13:51:43.448276Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 2,
+     "latitude": 39.12776,
+     "longitude": -103.61398,
+     "distance_from_origin_miles": 100.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T14:43:26.896552Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 3,
+     "latitude": 38.78904,
+     "longitude": -102.95657,
+     "distance_from_origin_miles": 150.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T15:35:10.344828Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 4,
+     "latitude": 38.42866,
+     "longitude": -102.32163,
+     "distance_from_origin_miles": 200.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T16:26:53.793103Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 5,
+     "latitude": 38.04706,
+     "longitude": -101.71046,
+     "distance_from_origin_miles": 250.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T17:18:37.241379Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 6,
+     "latitude": 37.64486,
+     "longitude": -101.12423,
+     "distance_from_origin_miles": 300.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T18:10:20.689655Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 7,
+     "latitude": 37.2228,
+     "longitude": -100.56396,
+     "distance_from_origin_miles": 350.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T19:02:04.137931Z",
+     "weather": {
+      "wind_speed_mph": 6.1,
+      "wind_gust_mph": 8.2,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 8,
+     "latitude": 36.78172,
+     "longitude": -100.03049,
+     "distance_from_origin_miles": 400.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T19:53:47.586207Z",
+     "weather": {
+      "wind_speed_mph": 6.5,
+      "wind_gust_mph": 8.7,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 9,
+     "latitude": 36.32259,
+     "longitude": -99.52445,
+     "distance_from_origin_miles": 450.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T20:45:31.034483Z",
+     "weather": {
+      "wind_speed_mph": 8.8,
+      "wind_gust_mph": 11.9,
+      "rain_inches_per_hour": 0.02,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 10,
+     "latitude": 35.84654,
+     "longitude": -99.04611,
+     "distance_from_origin_miles": 500.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T21:37:14.482759Z",
+     "weather": {
+      "wind_speed_mph": 14.3,
+      "wind_gust_mph": 19.3,
+      "rain_inches_per_hour": 0.07,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 11,
+     "latitude": 35.35469,
+     "longitude": -98.59567,
+     "distance_from_origin_miles": 550.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T22:28:57.931034Z",
+     "weather": {
+      "wind_speed_mph": 22.6,
+      "wind_gust_mph": 30.4,
+      "rain_inches_per_hour": 0.2,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Moderate",
+     "risk_score": 1,
+     "risk_reasons": [
+      "Rain 0.20 in/hr \u00e2\u2020\u2019 Moderate"
+     ]
+    },
+    {
+     "sequence": 12,
+     "latitude": 34.84821,
+     "longitude": -98.17308,
+     "distance_from_origin_miles": 600.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T23:20:41.379310Z",
+     "weather": {
+      "wind_speed_mph": 39.7,
+      "wind_gust_mph": 53.6,
+      "rain_inches_per_hour": 0.58,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Severe",
+     "risk_score": 3,
+     "risk_reasons": [
+      "Rain 0.58 in/hr \u00e2\u2020\u2019 Severe",
+      "Wind 39.7 mph with 42,000 lb load \u00e2\u2020\u2019 Severe",
+      "Wind 39.7 mph \u00e2\u2020\u2019 High"
+     ]
+    },
+    {
+     "sequence": 13,
+     "latitude": 34.32826,
+     "longitude": -97.77814,
+     "distance_from_origin_miles": 650.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-11T00:12:24.827586Z",
+     "weather": {
+      "wind_speed_mph": 52.1,
+      "wind_gust_mph": 70.4,
+      "rain_inches_per_hour": 0.92,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 52.1 mph with 42,000 lb load \u00e2\u2020\u2019 No Travel",
+      "Wind 52.1 mph \u00e2\u2020\u2019 Severe",
+      "Rain 0.92 in/hr \u00e2\u2020\u2019 Severe"
+     ]
+    },
+    {
+     "sequence": 14,
+     "latitude": 33.79603,
+     "longitude": -97.41044,
+     "distance_from_origin_miles": 700.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-11T01:04:08.275862Z",
+     "weather": {
+      "wind_speed_mph": 57.8,
+      "wind_gust_mph": 78.1,
+      "rain_inches_per_hour": 1.1,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 57.8 mph \u00e2\u2020\u2019 No Travel",
+      "Rain 1.10 in/hr \u00e2\u2020\u2019 No Travel"
+     ]
+    },
+    {
+     "sequence": 15,
+     "latitude": 33.2526,
+     "longitude": -97.06956,
+     "distance_from_origin_miles": 750.0,
+     "represented_miles": 46.52,
+     "estimated_arrival": "2026-11-11T01:55:51.724138Z",
+     "weather": {
+      "wind_speed_mph": 52.6,
+      "wind_gust_mph": 70.9,
+      "rain_inches_per_hour": 0.93,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 52.6 mph with 42,000 lb load \u00e2\u2020\u2019 No Travel",
+      "Wind 52.6 mph \u00e2\u2020\u2019 Severe",
+      "Rain 0.93 in/hr \u00e2\u2020\u2019 Severe"
+     ]
+    },
+    {
+     "sequence": 16,
+     "latitude": 32.7767,
+     "longitude": -96.797,
+     "distance_from_origin_miles": 793.04,
+     "represented_miles": 21.52,
+     "estimated_arrival": "2026-11-11T02:40:23.434901Z",
+     "weather": {
+      "wind_speed_mph": 38.8,
+      "wind_gust_mph": 52.4,
+      "rain_inches_per_hour": 0.55,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Severe",
+     "risk_score": 3,
+     "risk_reasons": [
+      "Rain 0.55 in/hr \u00e2\u2020\u2019 Severe",
+      "Wind 38.8 mph with 42,000 lb load \u00e2\u2020\u2019 Severe",
+      "Wind 38.8 mph \u00e2\u2020\u2019 High"
+     ]
+    }
+   ],
+   "travel_profile": "truck"
+  },
+  {
+   "route_id": "A",
+   "provider": "stub",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      -104.9903,
+      39.7392
+     ],
+     [
+      -96.797,
+      32.7767
+     ]
+    ]
+   },
+   "summary": {
+    "distance_miles": 782.4,
+    "duration_seconds": 51210.0,
+    "miles_by_level": {
+     "Low": 325.0,
+     "Moderate": 50.0,
+     "High": 66.2,
+     "Severe": 91.2,
+     "No Travel": 250.0
+    },
+    "unknown_miles": 0.0,
+    "average_risk_score": 1.86,
+    "highest_risk_level": "No Travel"
+   },
+   "checkpoints": [
+    {
+     "sequence": 0,
+     "latitude": 39.7392,
+     "longitude": -104.9903,
+     "distance_from_origin_miles": 0.0,
+     "represented_miles": 25.0,
+     "estimated_arrival": "2026-11-10T13:00:00Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 1,
+     "latitude": 39.28515,
+     "longitude": -104.45598,
+     "distance_from_origin_miles": 50.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T13:54:32.727273Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 2,
+     "latitude": 38.83242,
+     "longitude": -103.92322,
+     "distance_from_origin_miles": 100.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T14:49:05.454545Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 3,
+     "latitude": 38.381,
+     "longitude": -103.39201,
+     "distance_from_origin_miles": 150.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T15:43:38.181818Z",
+     "weather": {
+      "wind_speed_mph": 6.1,
+      "wind_gust_mph": 8.2,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 4,
+     "latitude": 37.93087,
+     "longitude": -102.86231,
+     "distance_from_origin_miles": 200.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T16:38:10.909091Z",
+     "weather": {
+      "wind_speed_mph": 7.0,
+      "wind_gust_mph": 9.5,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 5,
+     "latitude": 37.48202,
+     "longitude": -102.3341,
+     "distance_from_origin_miles": 250.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T17:32:43.636364Z",
+     "weather": {
+      "wind_speed_mph": 8.4,
+      "wind_gust_mph": 11.4,
+      "rain_inches_per_hour": 0.01,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 6,
+     "latitude": 37.03442,
+     "longitude": -101.80738,
+     "distance_from_origin_miles": 300.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T18:27:16.363636Z",
+     "weather": {
+      "wind_speed_mph": 13.7,
+      "wind_gust_mph": 18.5,
+      "rain_inches_per_hour": 0.07,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 7,
+     "latitude": 36.58805,
+     "longitude": -101.28211,
+     "distance_from_origin_miles": 350.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T19:21:49.090909Z",
+     "weather": {
+      "wind_speed_mph": 20.0,
+      "wind_gust_mph": 27.1,
+      "rain_inches_per_hour": 0.16,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Moderate",
+     "risk_score": 1,
+     "risk_reasons": [
+      "Rain 0.16 in/hr \u00e2\u2020\u2019 Moderate"
+     ]
+    },
+    {
+     "sequence": 8,
+     "latitude": 36.1429,
+     "longitude": -100.75826,
+     "distance_from_origin_miles": 400.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T20:16:21.818182Z",
+     "weather": {
+      "wind_speed_mph": 31.5,
+      "wind_gust_mph": 42.5,
+      "rain_inches_per_hour": 0.38,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "High",
+     "risk_score": 2,
+     "risk_reasons": [
+      "Rain 0.38 in/hr \u00e2\u2020\u2019 High",
+      "Wind 31.5 mph \u00e2\u2020\u2019 Moderate"
+     ]
+    },
+    {
+     "sequence": 9,
+     "latitude": 35.69894,
+     "longitude": -100.23582,
+     "distance_from_origin_miles": 450.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T21:10:54.545455Z",
+     "weather": {
+      "wind_speed_mph": 38.4,
+      "wind_gust_mph": 51.8,
+      "rain_inches_per_hour": 0.54,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Severe",
+     "risk_score": 3,
+     "risk_reasons": [
+      "Rain 0.54 in/hr \u00e2\u2020\u2019 Severe",
+      "Wind 38.4 mph with 42,000 lb load \u00e2\u2020\u2019 Severe",
+      "Wind 38.4 mph \u00e2\u2020\u2019 High"
+     ]
+    },
+    {
+     "sequence": 10,
+     "latitude": 35.25616,
+     "longitude": -99.71477,
+     "distance_from_origin_miles": 500.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T22:05:27.272727Z",
+     "weather": {
+      "wind_speed_mph": 47.1,
+      "wind_gust_mph": 63.6,
+      "rain_inches_per_hour": 0.78,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 47.1 mph with 42,000 lb load \u00e2\u2020\u2019 No Travel",
+      "Wind 47.1 mph \u00e2\u2020\u2019 Severe",
+      "Rain 0.78 in/hr \u00e2\u2020\u2019 Severe"
+     ]
+    },
+    {
+     "sequence": 11,
+     "latitude": 34.81454,
+     "longitude": -99.19508,
+     "distance_from_origin_miles": 550.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T23:00:00Z",
+     "weather": {
+      "wind_speed_mph": 55.7,
+      "wind_gust_mph": 75.2,
+      "rain_inches_per_hour": 1.03,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 55.7 mph \u00e2\u2020\u2019 No Travel",
+      "Rain 1.03 in/hr \u00e2\u2020\u2019 No Travel"
+     ]
+    },
+    {
+     "sequence": 12,
+     "latitude": 34.37405,
+     "longitude": -98.67673,
+     "distance_from_origin_miles": 600.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T23:54:32.727273Z",
+     "weather": {
+      "wind_speed_mph": 57.9,
+      "wind_gust_mph": 78.1,
+      "rain_inches_per_hour": 1.1,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 57.9 mph \u00e2\u2020\u2019 No Travel",
+      "Rain 1.10 in/hr \u00e2\u2020\u2019 No Travel"
+     ]
+    },
+    {
+     "sequence": 13,
+     "latitude": 33.93469,
+     "longitude": -98.1597,
+     "distance_from_origin_miles": 650.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-11T00:49:05.454545Z",
+     "weather": {
+      "wind_speed_mph": 54.5,
+      "wind_gust_mph": 73.7,
+      "rain_inches_per_hour": 0.99,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 54.5 mph with 42,000 lb load \u00e2\u2020\u2019 No Travel",
+      "Wind 54.5 mph \u00e2\u2020\u2019 Severe",
+      "Rain 0.99 in/hr \u00e2\u2020\u2019 Severe"
+     ]
+    },
+    {
+     "sequence": 14,
+     "latitude": 33.49643,
+     "longitude": -97.64396,
+     "distance_from_origin_miles": 700.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-11T01:43:38.181818Z",
+     "weather": {
+      "wind_speed_mph": 50.1,
+      "wind_gust_mph": 67.6,
+      "rain_inches_per_hour": 0.86,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 50.1 mph with 42,000 lb load \u00e2\u2020\u2019 No Travel",
+      "Wind 50.1 mph \u00e2\u2020\u2019 Severe",
+      "Rain 0.86 in/hr \u00e2\u2020\u2019 Severe"
+     ]
+    },
+    {
+     "sequence": 15,
+     "latitude": 33.05926,
+     "longitude": -97.12951,
+     "distance_from_origin_miles": 750.0,
+     "represented_miles": 41.19,
+     "estimated_arrival": "2026-11-11T02:38:10.909091Z",
+     "weather": {
+      "wind_speed_mph": 42.0,
+      "wind_gust_mph": 56.7,
+      "rain_inches_per_hour": 0.64,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Severe",
+     "risk_score": 3,
+     "risk_reasons": [
+      "Rain 0.64 in/hr \u00e2\u2020\u2019 Severe",
+      "Wind 42.0 mph with 42,000 lb load \u00e2\u2020\u2019 Severe",
+      "Wind 42.0 mph \u00e2\u2020\u2019 High"
+     ]
+    },
+    {
+     "sequence": 16,
+     "latitude": 32.7767,
+     "longitude": -96.797,
+     "distance_from_origin_miles": 782.38,
+     "represented_miles": 16.19,
+     "estimated_arrival": "2026-11-11T03:13:30.434033Z",
+     "weather": {
+      "wind_speed_mph": 34.2,
+      "wind_gust_mph": 46.3,
+      "rain_inches_per_hour": 0.44,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "High",
+     "risk_score": 2,
+     "risk_reasons": [
+      "Rain 0.44 in/hr \u00e2\u2020\u2019 High",
+      "Wind 34.2 mph \u00e2\u2020\u2019 Moderate"
+     ]
+    }
+   ],
+   "travel_profile": "car_adjusted_for_truck"
+  },
+  {
+   "route_id": "B",
+   "provider": "stub",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      -104.9903,
+      39.7392
+     ],
+     [
+      -104.71971,
+      39.27228
+     ],
+     [
+      -104.43449,
+      38.81786
+     ],
+     [
+      -104.13462,
+      38.37594
+     ],
+     [
+      -103.82012,
+      37.94653
+     ],
+     [
+      -103.49097,
+      37.52963
+     ],
+     [
+      -103.14719,
+      37.12523
+     ],
+     [
+      -102.78876,
+      36.73334
+     ],
+     [
+      -102.4157,
+      36.35395
+     ],
+     [
+      -102.02799,
+      35.98706
+     ],
+     [
+      -101.62565,
+      35.63269
+     ],
+     [
+      -101.20866,
+      35.29081
+     ],
+     [
+      -100.77704,
+      34.96145
+     ],
+     [
+      -100.33077,
+      34.64459
+     ],
+     [
+      -99.86987,
+      34.34023
+     ],
+     [
+      -99.39432,
+      34.04838
+     ],
+     [
+      -98.90414,
+      33.76903
+     ],
+     [
+      -98.39931,
+      33.50219
+     ],
+     [
+      -97.87985,
+      33.24786
+     ],
+     [
+      -97.34574,
+      33.00603
+     ],
+     [
+      -96.797,
+      32.7767
+     ],
+     [
+      -96.797,
+      32.7767
+     ]
+    ]
+   },
+   "summary": {
+    "distance_miles": 804.6,
+    "duration_seconds": 48277.0,
+    "miles_by_level": {
+     "Low": 225.0,
+     "Moderate": 0.0,
+     "High": 50.0,
+     "Severe": 179.6,
+     "No Travel": 350.0
+    },
+    "unknown_miles": 0.0,
+    "average_risk_score": 2.53,
+    "highest_risk_level": "No Travel"
+   },
+   "checkpoints": [
+    {
+     "sequence": 0,
+     "latitude": 39.7392,
+     "longitude": -104.9903,
+     "distance_from_origin_miles": 0.0,
+     "represented_miles": 25.0,
+     "estimated_arrival": "2026-11-10T13:00:00Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 1,
+     "latitude": 39.18024,
+     "longitude": -104.66364,
+     "distance_from_origin_miles": 50.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T13:50:00Z",
+     "weather": {
+      "wind_speed_mph": 6.0,
+      "wind_gust_mph": 8.1,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 2,
+     "latitude": 38.63188,
+     "longitude": -104.31094,
+     "distance_from_origin_miles": 100.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T14:40:00Z",
+     "weather": {
+      "wind_speed_mph": 6.3,
+      "wind_gust_mph": 8.5,
+      "rain_inches_per_hour": 0.0,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 3,
+     "latitude": 38.09555,
+     "longitude": -103.93179,
+     "distance_from_origin_miles": 150.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T15:30:00Z",
+     "weather": {
+      "wind_speed_mph": 8.6,
+      "wind_gust_mph": 11.6,
+      "rain_inches_per_hour": 0.01,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 4,
+     "latitude": 37.57277,
+     "longitude": -103.52599,
+     "distance_from_origin_miles": 200.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T16:20:00Z",
+     "weather": {
+      "wind_speed_mph": 14.8,
+      "wind_gust_mph": 20.1,
+      "rain_inches_per_hour": 0.08,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Low",
+     "risk_score": 0,
+     "risk_reasons": [
+      "All conditions within Low thresholds"
+     ]
+    },
+    {
+     "sequence": 5,
+     "latitude": 37.06504,
+     "longitude": -103.09362,
+     "distance_from_origin_miles": 250.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T17:10:00Z",
+     "weather": {
+      "wind_speed_mph": 26.1,
+      "wind_gust_mph": 35.2,
+      "rain_inches_per_hour": 0.27,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "High",
+     "risk_score": 2,
+     "risk_reasons": [
+      "Rain 0.27 in/hr \u00e2\u2020\u2019 High",
+      "Wind 26.1 mph \u00e2\u2020\u2019 Moderate"
+     ]
+    },
+    {
+     "sequence": 6,
+     "latitude": 36.57387,
+     "longitude": -102.63504,
+     "distance_from_origin_miles": 300.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T18:00:00Z",
+     "weather": {
+      "wind_speed_mph": 37.9,
+      "wind_gust_mph": 51.2,
+      "rain_inches_per_hour": 0.53,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Severe",
+     "risk_score": 3,
+     "risk_reasons": [
+      "Rain 0.53 in/hr \u00e2\u2020\u2019 Severe",
+      "Wind 37.9 mph with 42,000 lb load \u00e2\u2020\u2019 Severe",
+      "Wind 37.9 mph \u00e2\u2020\u2019 High"
+     ]
+    },
+    {
+     "sequence": 7,
+     "latitude": 36.10069,
+     "longitude": -102.15089,
+     "distance_from_origin_miles": 350.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T18:50:00Z",
+     "weather": {
+      "wind_speed_mph": 50.8,
+      "wind_gust_mph": 68.5,
+      "rain_inches_per_hour": 0.88,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 50.8 mph with 42,000 lb load \u00e2\u2020\u2019 No Travel",
+      "Wind 50.8 mph \u00e2\u2020\u2019 Severe",
+      "Rain 0.88 in/hr \u00e2\u2020\u2019 Severe"
+     ]
+    },
+    {
+     "sequence": 8,
+     "latitude": 35.64678,
+     "longitude": -101.64209,
+     "distance_from_origin_miles": 400.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T19:40:00Z",
+     "weather": {
+      "wind_speed_mph": 56.1,
+      "wind_gust_mph": 75.7,
+      "rain_inches_per_hour": 1.04,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 56.1 mph \u00e2\u2020\u2019 No Travel",
+      "Rain 1.04 in/hr \u00e2\u2020\u2019 No Travel"
+     ]
+    },
+    {
+     "sequence": 9,
+     "latitude": 35.21331,
+     "longitude": -101.10979,
+     "distance_from_origin_miles": 450.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T20:30:00Z",
+     "weather": {
+      "wind_speed_mph": 57.6,
+      "wind_gust_mph": 77.8,
+      "rain_inches_per_hour": 1.09,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 57.6 mph \u00e2\u2020\u2019 No Travel",
+      "Rain 1.09 in/hr \u00e2\u2020\u2019 No Travel"
+     ]
+    },
+    {
+     "sequence": 10,
+     "latitude": 34.80122,
+     "longitude": -100.5554,
+     "distance_from_origin_miles": 500.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T21:20:00Z",
+     "weather": {
+      "wind_speed_mph": 55.8,
+      "wind_gust_mph": 75.5,
+      "rain_inches_per_hour": 1.03,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 55.8 mph \u00e2\u2020\u2019 No Travel",
+      "Rain 1.03 in/hr \u00e2\u2020\u2019 No Travel"
+     ]
+    },
+    {
+     "sequence": 11,
+     "latitude": 34.41127,
+     "longitude": -99.98044,
+     "distance_from_origin_miles": 550.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T22:10:00Z",
+     "weather": {
+      "wind_speed_mph": 52.8,
+      "wind_gust_mph": 71.2,
+      "rain_inches_per_hour": 0.94,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 52.8 mph with 42,000 lb load \u00e2\u2020\u2019 No Travel",
+      "Wind 52.8 mph \u00e2\u2020\u2019 Severe",
+      "Rain 0.94 in/hr \u00e2\u2020\u2019 Severe"
+     ]
+    },
+    {
+     "sequence": 12,
+     "latitude": 34.04388,
+     "longitude": -99.38664,
+     "distance_from_origin_miles": 600.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T23:00:00Z",
+     "weather": {
+      "wind_speed_mph": 48.2,
+      "wind_gust_mph": 65.0,
+      "rain_inches_per_hour": 0.8,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 48.2 mph with 42,000 lb load \u00e2\u2020\u2019 No Travel",
+      "Wind 48.2 mph \u00e2\u2020\u2019 Severe",
+      "Rain 0.80 in/hr \u00e2\u2020\u2019 Severe"
+     ]
+    },
+    {
+     "sequence": 13,
+     "latitude": 33.69926,
+     "longitude": -98.77576,
+     "distance_from_origin_miles": 650.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-10T23:50:00Z",
+     "weather": {
+      "wind_speed_mph": 45.5,
+      "wind_gust_mph": 61.4,
+      "rain_inches_per_hour": 0.73,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "No Travel",
+     "risk_score": 4,
+     "risk_reasons": [
+      "Wind 45.5 mph with 42,000 lb load \u00e2\u2020\u2019 No Travel",
+      "Wind 45.5 mph \u00e2\u2020\u2019 Severe",
+      "Rain 0.73 in/hr \u00e2\u2020\u2019 Severe"
+     ]
+    },
+    {
+     "sequence": 14,
+     "latitude": 33.37746,
+     "longitude": -98.14951,
+     "distance_from_origin_miles": 700.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-11T00:40:00Z",
+     "weather": {
+      "wind_speed_mph": 44.9,
+      "wind_gust_mph": 60.6,
+      "rain_inches_per_hour": 0.71,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Severe",
+     "risk_score": 3,
+     "risk_reasons": [
+      "Rain 0.71 in/hr \u00e2\u2020\u2019 Severe",
+      "Wind 44.9 mph with 42,000 lb load \u00e2\u2020\u2019 Severe",
+      "Wind 44.9 mph \u00e2\u2020\u2019 High"
+     ]
+    },
+    {
+     "sequence": 15,
+     "latitude": 33.07829,
+     "longitude": -97.5096,
+     "distance_from_origin_miles": 750.0,
+     "represented_miles": 50.0,
+     "estimated_arrival": "2026-11-11T01:30:00Z",
+     "weather": {
+      "wind_speed_mph": 42.2,
+      "wind_gust_mph": 56.9,
+      "rain_inches_per_hour": 0.64,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Severe",
+     "risk_score": 3,
+     "risk_reasons": [
+      "Rain 0.64 in/hr \u00e2\u2020\u2019 Severe",
+      "Wind 42.2 mph with 42,000 lb load \u00e2\u2020\u2019 Severe",
+      "Wind 42.2 mph \u00e2\u2020\u2019 High"
+     ]
+    },
+    {
+     "sequence": 16,
+     "latitude": 32.80131,
+     "longitude": -96.85772,
+     "distance_from_origin_miles": 800.0,
+     "represented_miles": 27.31,
+     "estimated_arrival": "2026-11-11T02:20:00Z",
+     "weather": {
+      "wind_speed_mph": 39.3,
+      "wind_gust_mph": 53.1,
+      "rain_inches_per_hour": 0.57,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Severe",
+     "risk_score": 3,
+     "risk_reasons": [
+      "Rain 0.57 in/hr \u00e2\u2020\u2019 Severe",
+      "Wind 39.3 mph with 42,000 lb load \u00e2\u2020\u2019 Severe",
+      "Wind 39.3 mph \u00e2\u2020\u2019 High"
+     ]
+    },
+    {
+     "sequence": 17,
+     "latitude": 32.7767,
+     "longitude": -96.797,
+     "distance_from_origin_miles": 804.62,
+     "represented_miles": 2.31,
+     "estimated_arrival": "2026-11-11T02:24:37.162734Z",
+     "weather": {
+      "wind_speed_mph": 40.9,
+      "wind_gust_mph": 55.3,
+      "rain_inches_per_hour": 0.61,
+      "snowfall_inches_per_hour": 0.0
+     },
+     "risk_level": "Severe",
+     "risk_score": 3,
+     "risk_reasons": [
+      "Rain 0.61 in/hr \u00e2\u2020\u2019 Severe",
+      "Wind 40.9 mph with 42,000 lb load \u00e2\u2020\u2019 Severe",
+      "Wind 40.9 mph \u00e2\u2020\u2019 High"
+     ]
+    }
+   ],
+   "travel_profile": "car_adjusted_for_truck"
+  }
+ ],
+ "meta": {
+  "request_id": "add56b123824459eab8083d4d21066b2",
+  "timings_ms": {
+   "routing": 2.1,
+   "sampling": 3.0,
+   "weather": 17.4,
+   "risk": 3.6,
+   "ranking": 0.0,
+   "total": 33.9
+  },
+  "counters": {
+   "weather_locations": 48,
+   "weather_cache_hits": 48,
+   "weather_cache_misses": 0
+  },
+  "labels": {
+   "routing_providers": [
+    "stub"
+   ]
+  }
+ }
+}

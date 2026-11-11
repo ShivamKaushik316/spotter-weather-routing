@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night Dispatch — Weather-Aware Truck Routing (Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --risk-low: #22C55E;
+  --risk-moderate: #EAB308;
+  --risk-high: #F97316;
+  --risk-severe: #EF4444;
+  --risk-no-travel: #A855F7;
+  --risk-unknown: #64748B;
+  --radius-panel: 14px;
+  --radius-control: 9px;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+}
+:root[data-theme="dark"] {
+  --bg: #0B1020;
+  --map-land: #0E1528;
+  --map-water: #0A1730;
+  --map-grid: rgba(148, 163, 184, .05);
+  --map-border: rgba(148, 163, 184, .16);
+  --map-road: rgba(148, 163, 184, .09);
+  --map-label: #5B6B85;
+  --map-city: #8DA0BC;
+  --panel: rgba(14, 20, 36, .76);
+  --panel-raised: rgba(255, 255, 255, .04);
+  --panel-hover: rgba(255, 255, 255, .07);
+  --border: rgba(255, 255, 255, .08);
+  --border-strong: rgba(255, 255, 255, .16);
+  --text: #E5E7EB;
+  --muted: #94A3B8;
+  --faint: #556179;
+  --accent: #22D3EE;
+  --accent-contrast: #04222A;
+  --accent-soft: rgba(34, 211, 238, .14);
+  --casing: #050814;
+  --shadow: 0 24px 60px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .35);
+  --night: rgba(99, 102, 241, .18);
+  --heat-blend: screen;
+  --heat-opacity: .9;
+}
+:root[data-theme="light"] {
+  --bg: #E8EDF4;
+  --map-land: #EEF2F7;
+  --map-water: #D6E4F3;
+  --map-grid: rgba(15, 23, 42, .045);
+  --map-border: rgba(15, 23, 42, .16);
+  --map-road: rgba(15, 23, 42, .08);
+  --map-label: #7A8799;
+  --map-city: #475569;
+  --panel: rgba(255, 255, 255, .84);
+  --panel-raised: rgba(15, 23, 42, .035);
+  --panel-hover: rgba(15, 23, 42, .06);
+  --border: rgba(15, 23, 42, .08);
+  --border-strong: rgba(15, 23, 42, .16);
+  --text: #0F172A;
+  --muted: #5B6779;
+  --faint: #94A3B8;
+  --accent: #0891B2;
+  --accent-contrast: #FFFFFF;
+  --accent-soft: rgba(8, 145, 178, .12);
+  --casing: #FFFFFF;
+  --shadow: 0 24px 60px rgba(15, 23, 42, .16), 0 2px 6px rgba(15, 23, 42, .08);
+  --night: rgba(79, 70, 229, .10);
+  --heat-blend: multiply;
+  --heat-opacity: .75;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background .3s var(--ease-out), color .3s var(--ease-out);
+}
+button, input { font: inherit; color: inherit; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+#map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
+#map .land { fill: var(--map-land); transition: fill .3s; }
+#map .water { fill: var(--map-water); transition: fill .3s; }
+#map .grid-line { stroke: var(--map-grid); stroke-width: 1; }
+#map .state-border { fill: none; stroke: var(--map-border); stroke-width: 1.2; stroke-dasharray: 6 5; }
+#map .highway { fill: none; stroke: var(--map-road); stroke-width: 2; }
+#map .city-dot { fill: var(--map-city); }
+#map .city-label { fill: var(--map-label); font: 500 15px var(--font-sans); letter-spacing: .02em; }
+#map .endpoint-label { fill: var(--text); font: 600 17px var(--font-sans); }
+#heat { mix-blend-mode: var(--heat-blend); opacity: var(--heat-opacity); transition: opacity .3s; }
+#heat.hidden { opacity: 0; }
+.route-casing { fill: none; stroke: var(--casing); stroke-linecap: round; stroke-linejoin: round; }
+.route-segment { fill: none; stroke-linecap: round; stroke-linejoin: round; transition: opacity .25s; }
+.route-group { transition: opacity .25s var(--ease-out); }
+.route-group.dimmed { opacity: .32; }
+.route-group.hidden { opacity: 0; pointer-events: none; }
+.route-hit { fill: none; stroke: transparent; stroke-width: 22; cursor: pointer; }
+.checkpoint { stroke: var(--casing); stroke-width: 2.5; cursor: pointer; transition: r .15s; }
+.checkpoint:hover { r: 8; }
+.checkpoints.hidden { display: none; }
+.truck-body { fill: var(--accent); stroke: var(--casing); stroke-width: 2.5; }
+.truck-arrow { fill: var(--accent-contrast); }
+.truck-pulse { fill: var(--accent); opacity: .25; transform-box: fill-box; transform-origin: center; animation: pulse 1.8s var(--ease-out) infinite; }
+@keyframes pulse { from { transform: scale(.6); opacity: .45; } to { transform: scale(2.2); opacity: 0; } }
+.route-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.1s var(--ease-out) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.fade-in { opacity: 0; animation: fadeIn .5s var(--ease-out) forwards; }
+@keyframes fadeIn { to { opacity: 1; } }
+
+.glass {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  transition: background .3s, border-color .3s;
+}
+
+.left-panel {
+  position: absolute; top: 16px; left: 16px; bottom: 140px; width: 392px;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.brand { display: flex; align-items: center; gap: 10px; padding: 16px 18px 14px; border-bottom: 1px solid var(--border); }
+.brand-mark {
+  width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--accent), #6366F1); color: #fff;
+}
+.brand-title { font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand-subtitle { font-size: 12px; color: var(--muted); }
+.panel-scroll { overflow-y: auto; padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 18px; scrollbar-width: thin; }
+.section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--faint); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+.place-stack { position: relative; display: flex; flex-direction: column; gap: 6px; }
+.place-field {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: var(--panel-raised); border: 1px solid var(--border); border-radius: var(--radius-control);
+  transition: border-color .15s, background .15s;
+}
+.place-field:focus-within { border-color: var(--accent); background: var(--accent-soft); }
+.place-field input { flex: 1; background: none; border: 0; outline: 0; font-size: 14px; font-weight: 500; }
+.place-marker { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.place-marker.origin { border: 2.5px solid var(--accent); }
+.place-marker.destination { background: var(--accent); border-radius: 3px; }
+.swap-button {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border-strong);
+  background: var(--panel); display: grid; place-items: center; cursor: pointer; color: var(--muted);
+}
+.swap-button:hover { color: var(--text); }
+.hint-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+.sample-trips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.chip {
+  padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border); background: var(--panel-raised); cursor: pointer; color: var(--muted);
+  transition: all .15s;
+}
+.chip:hover { color: var(--text); border-color: var(--border-strong); }
+.chip.active { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field {
+  padding: 9px 12px; border-radius: var(--radius-control); background: var(--panel-raised); border: 1px solid var(--border);
+}
+.field-caption { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+.field-value { font-size: 14px; font-weight: 600; }
+.field-value small { font-weight: 500; color: var(--muted); font-size: 11px; }
+
+.load-header { display: flex; justify-content: space-between; align-items: baseline; }
+.load-value { font-size: 20px; font-weight: 600; }
+.load-value span { font-size: 12px; color: var(--muted); font-weight: 500; }
+.load-track { position: relative; margin: 12px 0 6px; height: 22px; }
+.load-track input { width: 100%; margin: 0; }
+.threshold-mark { position: absolute; top: -4px; width: 1px; height: 30px; background: var(--border-strong); pointer-events: none; }
+.threshold-mark span { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--faint); white-space: nowrap; }
+.load-hint {
+  margin-top: 18px; padding: 8px 10px; border-radius: 8px; font-size: 12px; line-height: 1.45;
+  background: rgba(168, 85, 247, .1); border: 1px solid rgba(168, 85, 247, .25); color: var(--muted);
+}
+.load-hint strong { color: var(--text); font-weight: 600; }
+
+.segmented { display: grid; grid-template-columns: repeat(3, 1fr); padding: 3px; gap: 3px; border-radius: var(--radius-control); background: var(--panel-raised); border: 1px solid var(--border); }
+.segmented button { border: 0; background: none; padding: 7px 0; border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .15s; }
+.segmented button.active { background: var(--panel); color: var(--text); box-shadow: 0 1px 3px rgba(0, 0, 0, .25); }
+
+.primary-button {
+  width: 100%; padding: 12px; border-radius: 10px; border: 0; cursor: pointer;
+  background: var(--accent); color: var(--accent-contrast); font-weight: 700; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .1s, filter .15s; position: relative; overflow: hidden;
+}
+.primary-button:hover { filter: brightness(1.08); }
+.primary-button:active { transform: scale(.985); }
+.primary-button.loading::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .45), transparent);
+  animation: shimmer .9s linear infinite;
+}
+@keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+kbd { font-family: var(--font-mono); font-size: 10px; padding: 1px 5px; border-radius: 4px; border: 1px solid currentColor; opacity: .6; }
+
+.route-strip {
+  position: relative; padding: 12px 12px 12px 16px; border-radius: 12px; cursor: pointer;
+  background: var(--panel-raised); border: 1px solid var(--border);
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.route-strip + .route-strip { margin-top: 8px; }
+.route-strip:hover { background: var(--panel-hover); }
+.route-strip.selected { border-color: var(--accent); }
+.route-strip.recommended { box-shadow: 0 0 0 1px var(--accent-soft), 0 0 28px -6px var(--accent); }
+.route-strip::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--strip-color, var(--faint)); }
+.strip-top { display: flex; align-items: center; gap: 10px; }
+.route-letter { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--panel-hover); }
+.route-strip.recommended .route-letter { background: var(--accent); color: var(--accent-contrast); }
+.route-via { font-size: 13px; font-weight: 600; }
+.route-provider { font-size: 11px; color: var(--muted); }
+.badge {
+  margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  padding: 3px 7px; border-radius: 6px;
+}
+.badge.recommended { color: var(--accent); background: var(--accent-soft); }
+.badge.danger { color: var(--risk-no-travel); background: rgba(168, 85, 247, .14); }
+.strip-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+.stat-value { font-size: 13px; font-weight: 600; }
+.stat-caption { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.risk-ribbon { display: flex; height: 7px; border-radius: 4px; overflow: hidden; margin-top: 10px; gap: 1px; }
+.risk-ribbon i { flex: 1; }
+.strip-reason { font-size: 12px; color: var(--muted); margin-top: 9px; line-height: 1.4; display: flex; gap: 6px; }
+.strip-reason svg { flex: none; margin-top: 1px; color: var(--accent); }
+
+.toolbar { position: absolute; top: 16px; right: 16px; display: flex; gap: 8px; padding: 6px; }
+.tool-button {
+  height: 34px; padding: 0 12px; border-radius: 9px; border: 1px solid transparent; background: none; cursor: pointer;
+  display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; color: var(--muted);
+  transition: all .15s;
+}
+.tool-button:hover { color: var(--text); background: var(--panel-hover); }
+.tool-button.active { color: var(--text); background: var(--panel-raised); border-color: var(--border); }
+.tool-button .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); transition: background .15s; }
+.tool-button.active .dot { background: var(--accent); }
+.toolbar-divider { width: 1px; background: var(--border); margin: 4px 2px; }
+
+.warning-banner {
+  position: absolute; top: 16px; left: 424px; display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; font-size: 13px; max-width: 460px;
+  border-color: rgba(168, 85, 247, .35);
+}
+.warning-icon { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; background: rgba(168, 85, 247, .16); color: var(--risk-no-travel); flex: none; }
+.warning-banner button { margin-left: 6px; background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 16px; }
+
+.drawer {
+  position: absolute; top: 72px; right: 16px; width: 316px; padding: 16px;
+  transform: translateX(calc(100% + 24px)); transition: transform .35s var(--ease-out);
+}
+.drawer.open { transform: none; }
+.drawer-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.drawer-title { font-size: 15px; font-weight: 700; }
+.drawer-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.close-button { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; }
+.level-pill { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.weather-cell { padding: 10px; border-radius: 10px; background: var(--panel-raised); border: 1px solid var(--border); }
+.weather-cell .stat-value { font-size: 16px; }
+.reason-list { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.reason-list li { font-size: 12px; padding: 8px 10px; border-radius: 8px; background: var(--panel-raised); border-left: 3px solid var(--reason-color, var(--faint)); }
+
+.window-card { position: absolute; right: 16px; bottom: 140px; width: 300px; padding: 14px; }
+.window-title { font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; }
+.window-title span { font-size: 11px; color: var(--muted); font-weight: 500; }
+.window-bars { display: flex; align-items: flex-end; gap: 5px; height: 64px; margin: 12px 0 6px; }
+.window-bar { flex: 1; border-radius: 4px 4px 2px 2px; background: var(--panel-hover); position: relative; transition: height .4s var(--ease-out); }
+.window-bar.best { background: var(--accent); }
+.window-axis { display: flex; gap: 5px; font-size: 10px; color: var(--faint); }
+.window-axis span { flex: 1; text-align: center; }
+.window-summary { font-size: 12px; color: var(--muted); margin: 10px 0; line-height: 1.45; }
+.window-summary strong { color: var(--text); }
+.secondary-button {
+  width: 100%; padding: 9px; border-radius: 9px; cursor: pointer; font-weight: 600; font-size: 13px;
+  border: 1px solid var(--accent); color: var(--accent); background: var(--accent-soft);
+}
+
+.dock { position: absolute; left: 16px; right: 16px; bottom: 16px; height: 108px; display: flex; align-items: center; gap: 18px; padding: 0 20px; }
+.play-button {
+  width: 48px; height: 48px; border-radius: 50%; border: 0; cursor: pointer; flex: none;
+  background: var(--accent); color: var(--accent-contrast); display: grid; place-items: center;
+  box-shadow: 0 0 0 6px var(--accent-soft); transition: transform .1s;
+}
+.play-button:active { transform: scale(.94); }
+.clock { width: 128px; flex: none; }
+.clock-time { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+.clock-offset { font-size: 12px; color: var(--muted); }
+.speed-toggle { display: flex; gap: 2px; margin-top: 6px; }
+.speed-toggle button { border: 1px solid var(--border); background: none; font-size: 10px; padding: 2px 6px; border-radius: 5px; cursor: pointer; color: var(--muted); font-family: var(--font-mono); }
+.speed-toggle button.active { color: var(--accent); border-color: var(--accent); }
+.scrubber { flex: 1; position: relative; height: 64px; }
+.scrubber-track { position: absolute; left: 0; right: 0; top: 22px; height: 20px; border-radius: 6px; background: var(--panel-raised); border: 1px solid var(--border); overflow: hidden; }
+.night-band { position: absolute; top: 0; bottom: 0; background: var(--night); }
+.scrubber-progress { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, transparent, var(--accent-soft)); border-right: 2px solid var(--accent); }
+.tick { position: absolute; top: 22px; width: 1px; height: 6px; background: var(--border-strong); }
+.tick.major { height: 20px; background: var(--border-strong); opacity: .6; }
+.tick-label { position: absolute; top: 46px; transform: translateX(-50%); font-size: 10px; color: var(--faint); font-family: var(--font-mono); }
+.day-label { position: absolute; top: 2px; font-size: 11px; font-weight: 600; color: var(--muted); transform: translateX(4px); }
+.day-divider { position: absolute; top: 2px; bottom: 18px; width: 1px; background: var(--border-strong); }
+.scrubber input { position: absolute; left: 0; right: 0; top: 18px; width: 100%; height: 28px; margin: 0; opacity: 0; cursor: grab; }
+.scrubber-thumb {
+  position: absolute; top: 14px; width: 18px; height: 36px; margin-left: -9px; border-radius: 6px; pointer-events: none;
+  background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), 0 4px 10px rgba(0, 0, 0, .35);
+}
+.legend { flex: none; display: flex; flex-direction: column; gap: 8px; padding-left: 18px; border-left: 1px solid var(--border); }
+.legend-items { display: grid; grid-template-columns: repeat(3, auto); gap: 5px 14px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.legend-swatch { width: 10px; height: 10px; border-radius: 3px; }
+.heat-ramp { height: 6px; border-radius: 3px; background: linear-gradient(90deg, rgba(234, 179, 8, .15), #EAB308, #F97316, #EF4444, #FF2BD6); }
+.heat-ramp-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--faint); margin-top: 3px; }
+
+.toast {
+  position: absolute; left: 50%; bottom: 140px; transform: translate(-50%, 20px); opacity: 0;
+  padding: 10px 14px; font-size: 13px; font-weight: 500; transition: all .3s var(--ease-out); pointer-events: none;
+}
+.toast.visible { transform: translate(-50%, 0); opacity: 1; }
+.mockup-tag { position: absolute; left: 424px; bottom: 136px; font-size: 11px; color: var(--faint); padding: 0 4px; }
+
+input[type="range"].load-range { -webkit-appearance: none; appearance: none; background: transparent; height: 22px; }
+input[type="range"].load-range::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--risk-low) 0 37.5%, var(--risk-severe) 37.5% 50%, var(--risk-no-travel) 50% 100%); opacity: .7; }
+input[type="range"].load-range::-moz-range-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--risk-low) 0 37.5%, var(--risk-severe) 37.5% 50%, var(--risk-no-travel) 50% 100%); opacity: .7; }
+input[type="range"].load-range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--text); margin-top: -6px; border: 3px solid var(--bg); }
+input[type="range"].load-range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--text); border: 3px solid var(--bg); }
+
+@media (max-width: 960px) {
+  .left-panel { top: auto; left: 8px; right: 8px; width: auto; bottom: 132px; max-height: 46vh; }
+  .warning-banner { left: 8px; right: 8px; top: 64px; max-width: none; }
+  .toolbar { left: 8px; right: 8px; top: 8px; overflow-x: auto; }
+  .window-card, .mockup-tag, .legend { display: none; }
+  .dock { left: 8px; right: 8px; bottom: 8px; gap: 12px; padding: 0 14px; }
+  .clock { width: 96px; }
+  .clock-time { font-size: 20px; }
+  .drawer { top: auto; bottom: 132px; left: 8px; right: 8px; width: auto; transform: translateY(calc(100% + 140px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<svg id="map" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map of route options from Denver to Dallas">
+  <defs>
+    <radialGradient id="radar-gradient">
+      <stop offset="0" stop-color="#FF2BD6" stop-opacity=".95"/>
+      <stop offset=".22" stop-color="#EF4444" stop-opacity=".85"/>
+      <stop offset=".46" stop-color="#F97316" stop-opacity=".62"/>
+      <stop offset=".72" stop-color="#EAB308" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#EAB308" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="heat-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0H0V80" class="grid-line" fill="none"/>
+    </pattern>
+  </defs>
+  <rect class="land" x="-400" y="-400" width="2400" height="1800"/>
+  <path class="water" d="M1380 1000 C1420 930 1500 900 1600 880 L1600 1000 Z"/>
+  <path class="water" d="M-50 760 C60 790 120 860 110 1000 L-50 1000 Z"/>
+  <rect x="-400" y="-400" width="2400" height="1800" fill="url(#grid)"/>
+  <g>
+    <path class="state-border" d="M210 120 L780 120 L780 470 L210 470 Z"/>
+    <path class="state-border" d="M780 120 L1240 120 L1240 470"/>
+    <path class="state-border" d="M600 470 L600 560 L1150 560 L1180 620 L1300 640"/>
+    <path class="state-border" d="M600 560 L600 950"/>
+    <path class="state-border" d="M600 470 L210 470 L210 950"/>
+  </g>
+  <g>
+    <path class="highway" d="M330 230 L400 420 L470 540 L760 675 L1010 760 L1220 820"/>
+    <path class="highway" d="M330 230 L1240 300"/>
+    <path class="highway" d="M980 380 L1040 560 L1220 820"/>
+    <path class="highway" d="M760 675 L1040 560 L1400 520"/>
+    <path class="highway" d="M210 640 L760 675"/>
+  </g>
+  <g id="heat" filter="url(#heat-blur)"></g>
+  <g id="routes"></g>
+  <g id="cities">
+    <circle class="city-dot" cx="390" cy="330" r="3.5"/><text class="city-label" x="402" y="335">Colorado Springs</text>
+    <circle class="city-dot" cx="405" cy="400" r="3.5"/><text class="city-label" x="417" y="405">Pueblo</text>
+    <circle class="city-dot" cx="480" cy="300" r="3.5"/><text class="city-label" x="492" y="292">Limon</text>
+    <circle class="city-dot" cx="640" cy="420" r="3.5"/><text class="city-label" x="652" y="414">Lamar</text>
+    <circle class="city-dot" cx="980" cy="380" r="3.5"/><text class="city-label" x="992" y="374">Wichita</text>
+    <circle class="city-dot" cx="760" cy="675" r="3.5"/><text class="city-label" x="700" y="702">Amarillo</text>
+    <circle class="city-dot" cx="1040" cy="560" r="3.5"/><text class="city-label" x="1052" y="552">Oklahoma City</text>
+    <circle class="city-dot" cx="1010" cy="760" r="3.5"/><text class="city-label" x="1022" y="784">Wichita Falls</text>
+  </g>
+  <g id="trucks"></g>
+  <g id="endpoints">
+    <circle cx="330" cy="230" r="9" fill="var(--bg)" stroke="var(--accent)" stroke-width="4"/>
+    <text class="endpoint-label" x="300" y="206" text-anchor="end">Denver, CO</text>
+    <rect x="1211" y="811" width="18" height="18" rx="4" fill="var(--accent)" stroke="var(--casing)" stroke-width="3"/>
+    <text class="endpoint-label" x="1244" y="826">Dallas, TX</text>
+  </g>
+</svg>
+
+<aside class="left-panel glass" aria-label="Trip planner">
+  <header class="brand">
+    <div class="brand-mark">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 8-8"/><path d="M14 8h6v6"/></svg>
+    </div>
+    <div>
+      <div class="brand-title">Night Dispatch</div>
+      <div class="brand-subtitle">Weather-aware truck routing</div>
+    </div>
+  </header>
+
+  <div class="panel-scroll">
+    <section>
+      <div class="section-label">Trip</div>
+      <div class="place-stack">
+        <label class="place-field"><span class="place-marker origin"></span><input value="Denver, CO, USA" aria-label="Origin"></label>
+        <label class="place-field"><span class="place-marker destination"></span><input value="Dallas, TX, USA" aria-label="Destination"></label>
+        <button class="swap-button" aria-label="Swap origin and destination">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg>
+        </button>
+      </div>
+      <div class="hint-row">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+        or click the map to drop origin, then destination
+      </div>
+      <div class="sample-trips">
+        <button class="chip active">Denver → Dallas</button>
+        <button class="chip">Chicago → St. Louis</button>
+        <button class="chip">Seattle → Portland</button>
+      </div>
+    </section>
+
+    <section class="field-row">
+      <div class="field">
+        <div class="field-caption">Departure</div>
+        <div class="field-value mono">Tue 10 Nov · 11:00 <small>MST</small></div>
+      </div>
+      <div>
+        <div class="field-caption" style="margin-bottom:5px">Sample every</div>
+        <div class="segmented" role="radiogroup" aria-label="Sampling interval">
+          <button>10 mi</button><button class="active">25 mi</button><button>50 mi</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="load-header">
+        <div class="section-label" style="margin:0">Load weight</div>
+        <div class="load-value mono" id="load-value">42,000 <span>lb</span></div>
+      </div>
+      <div class="load-track">
+        <input id="load-range" class="load-range" type="range" min="0" max="80000" step="500" value="42000" aria-label="Load weight in pounds">
+        <div class="threshold-mark" style="left:37.5%"><span>30k</span></div>
+        <div class="threshold-mark" style="left:50%"><span>40k</span></div>
+      </div>
+      <div class="sample-trips" style="margin-top:22px">
+        <button class="chip" data-load="0">Empty</button>
+        <button class="chip" data-load="40000">Half</button>
+        <button class="chip" data-load="80000">Full 80k</button>
+      </div>
+      <div class="load-hint" id="load-hint"></div>
+    </section>
+
+    <button class="primary-button" id="plan-button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      Plan safest route <kbd>↵</kbd>
+    </button>
+
+    <section>
+      <div class="section-label">Routes <span class="mono" style="text-transform:none;letter-spacing:0">ranked by risk</span></div>
+      <div id="route-list"></div>
+    </section>
+  </div>
+</aside>
+
+<div class="warning-banner glass" id="warning-banner" role="status">
+  <div class="warning-icon">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>
+  </div>
+  <div><strong>Route B</strong> crosses <span class="mono">18.0 mi</span> of No Travel conditions near Lamar, CO.</div>
+  <button aria-label="Dismiss" onclick="this.parentElement.style.display='none'">×</button>
+</div>
+
+<nav class="toolbar glass" aria-label="Map layers">
+  <button class="tool-button active" data-layer="heat"><span class="dot"></span>Heatmap</button>
+  <button class="tool-button active" data-layer="checkpoints"><span class="dot"></span>Checkpoints</button>
+  <button class="tool-button active" data-layer="alternates"><span class="dot"></span>Alternates</button>
+  <div class="toolbar-divider"></div>
+  <button class="tool-button" id="share-button" aria-label="Copy share link">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7"/></svg>
+    Share
+  </button>
+  <button class="tool-button" id="theme-button" aria-label="Toggle theme">
+    <svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></svg>
+  </button>
+</nav>
+
+<aside class="drawer glass" id="drawer" aria-label="Checkpoint details">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-title" id="drawer-title"></div>
+      <div class="drawer-subtitle mono" id="drawer-subtitle"></div>
+    </div>
+    <button class="close-button" id="drawer-close" aria-label="Close">×</button>
+  </div>
+  <div id="drawer-level"></div>
+  <div class="weather-grid" id="drawer-weather"></div>
+  <ul class="reason-list" id="drawer-reasons"></ul>
+</aside>
+
+<section class="window-card glass" aria-label="Best departure window">
+  <div class="window-title">Best departure <span>next 6 h · Route A</span></div>
+  <div class="window-bars" id="window-bars"></div>
+  <div class="window-axis" id="window-axis"></div>
+  <div class="window-summary">Leaving <strong>3 h later</strong> drops High miles <span class="mono">48.0 → 22.0</span> and average risk <span class="mono">0.42 → 0.31</span>.</div>
+  <button class="secondary-button">Re-plan for 14:00</button>
+</section>
+
+<div class="mockup-tag">Design mockup · static data · drag the timeline, click checkpoints, toggle theme</div>
+
+<footer class="dock glass" aria-label="Forecast timeline">
+  <button class="play-button" id="play-button" aria-label="Play forecast">
+    <svg id="play-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"></svg>
+  </button>
+  <div class="clock">
+    <div class="clock-time mono" id="clock-time">Tue 11:00</div>
+    <div class="clock-offset mono" id="clock-offset">+0.0 h</div>
+    <div class="speed-toggle" id="speed-toggle">
+      <button class="active" data-speed="1">1×</button><button data-speed="4">4×</button><button data-speed="8">8×</button>
+    </div>
+  </div>
+  <div class="scrubber" id="scrubber">
+    <div class="scrubber-track" id="scrubber-track"><div class="scrubber-progress" id="scrubber-progress"></div></div>
+    <input id="time-range" type="range" min="0" max="48" step="0.05" value="0" aria-label="Forecast hour">
+    <div class="scrubber-thumb" id="scrubber-thumb"></div>
+  </div>
+  <div class="legend">
+    <div class="legend-items" id="legend-items"></div>
+    <div>
+      <div class="heat-ramp"></div>
+      <div class="heat-ramp-labels"><span>heatmap: calm</span><span>extreme</span></div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast glass" id="toast">Share link copied to clipboard</div>
+
+<script>
+const RISK_LEVELS = {
+  L: { label: "Low", color: "#22C55E", score: 0 },
+  M: { label: "Moderate", color: "#EAB308", score: 1 },
+  H: { label: "High", color: "#F97316", score: 2 },
+  S: { label: "Severe", color: "#EF4444", score: 3 },
+  N: { label: "No Travel", color: "#A855F7", score: 4 },
+  U: { label: "Unknown", color: "#64748B", score: null },
+};
+const LOAD_POUNDS = 42000;
+const SAMPLE_INTERVAL_MILES = 25;
+const DEPARTURE_LOCAL_HOUR = 11;
+const WEEKDAYS = ["Tue", "Wed", "Thu", "Fri"];
+const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+
+const ROUTES = [
+  {
+    id: "A", via: "via I-25 · US-287", provider: "openrouteservice · truck",
+    miles: 796, hours: 14.4, averageRisk: 0.42, severeMiles: 0, highMiles: 48, noTravelMiles: 0,
+    path: "M330 230 C360 300 380 360 400 420 S440 520 520 580 S700 650 800 690 S1000 760 1220 820",
+    riskBands: [[0.18, 0.26, "M"], [0.40, 0.46, "H"], [0.46, 0.52, "M"], [0.70, 0.74, "M"]],
+    reason: "Recommended: 12.0 fewer Severe miles than Route C.",
+  },
+  {
+    id: "C", via: "via I-70 · I-35", provider: "osrm",
+    miles: 845, hours: 15.7, averageRisk: 0.58, severeMiles: 12, highMiles: 25, noTravelMiles: 0,
+    path: "M330 230 C380 260 560 230 740 300 S1000 420 1060 560 S1150 760 1220 820",
+    riskBands: [[0.24, 0.27, "H"], [0.27, 0.30, "S"], [0.30, 0.33, "H"], [0.33, 0.40, "M"], [0.62, 0.66, "M"]],
+    reason: "12.0 Severe miles near Wichita around 16:00.",
+  },
+  {
+    id: "B", via: "via US-287 · I-40", provider: "osrm · detour",
+    miles: 881, hours: 15.2, averageRisk: 0.91, severeMiles: 31, highMiles: 57, noTravelMiles: 18,
+    path: "M330 230 C450 280 560 330 640 420 S760 560 900 600 S1100 700 1220 820",
+    riskBands: [[0.20, 0.30, "M"], [0.30, 0.37, "H"], [0.37, 0.405, "S"], [0.405, 0.425, "N"], [0.425, 0.45, "S"], [0.45, 0.50, "H"], [0.50, 0.56, "M"]],
+    reason: "Crosses 18.0 mi of No Travel conditions near Lamar.",
+  },
+];
+const RECOMMENDED_ROUTE_ID = "A";
+
+const STORM_CELLS = [
+  { x: 560, y: 360, vx: 9, vy: 5.5, radius: 150, peakHour: 5, spreadHours: 9, intensity: 1 },
+  { x: 900, y: 300, vx: 6, vy: 3, radius: 120, peakHour: 14, spreadHours: 8, intensity: 0.8 },
+  { x: 420, y: 640, vx: 10, vy: 1.5, radius: 170, peakHour: 26, spreadHours: 10, intensity: 0.95 },
+  { x: 1150, y: 520, vx: -3, vy: 4, radius: 110, peakHour: 38, spreadHours: 7, intensity: 0.7 },
+  { x: 700, y: 820, vx: 7, vy: -4, radius: 130, peakHour: 44, spreadHours: 8, intensity: 0.75 },
+];
+const STORM_SATELLITES = [[0, 0, 1], [0.55, 0.2, 0.62], [-0.45, 0.35, 0.55], [0.1, -0.5, 0.5]];
+
+const state = {
+  hour: 0,
+  playing: false,
+  speed: 1,
+  selectedRouteId: RECOMMENDED_ROUTE_ID,
+  hoveredRouteId: null,
+  layers: { heat: true, checkpoints: true, alternates: true },
+};
+
+const element = (id) => document.getElementById(id);
+const createSvg = (tag, attributes = {}) => {
+  const node = document.createElementNS(SVG_NAMESPACE, tag);
+  Object.entries(attributes).forEach(([name, value]) => node.setAttribute(name, value));
+  return node;
+};
+
+function levelAt(route, fraction) {
+  const band = route.riskBands.find(([start, end]) => fraction >= start && fraction < end);
+  return band ? band[2] : "L";
+}
+
+function checkpointFractions(route) {
+  const fractions = [];
+  for (let mile = 0; mile < route.miles - 1e-6; mile += SAMPLE_INTERVAL_MILES) fractions.push(mile / route.miles);
+  fractions.push(1);
+  return fractions;
+}
+
+function segmentPathData(path, startFraction, endFraction) {
+  const totalLength = path.getTotalLength();
+  const steps = Math.max(2, Math.ceil((endFraction - startFraction) * 160));
+  let pathData = "";
+  for (let step = 0; step <= steps; step += 1) {
+    const point = path.getPointAtLength((startFraction + (endFraction - startFraction) * (step / steps)) * totalLength);
+    pathData += `${step ? "L" : "M"}${point.x.toFixed(1)} ${point.y.toFixed(1)}`;
+  }
+  return pathData;
+}
+
+function formatClock(hourOffset) {
+  const totalMinutes = Math.round((DEPARTURE_LOCAL_HOUR + hourOffset) * 60);
+  const dayIndex = Math.floor(totalMinutes / 1440);
+  const minutesOfDay = totalMinutes % 1440;
+  const hours = String(Math.floor(minutesOfDay / 60)).padStart(2, "0");
+  const minutes = String(minutesOfDay % 60).padStart(2, "0");
+  return `${WEEKDAYS[dayIndex]} ${hours}:${minutes}`;
+}
+
+function formatDuration(hours) {
+  const wholeHours = Math.floor(hours);
+  return `${wholeHours}h ${String(Math.round((hours - wholeHours) * 60)).padStart(2, "0")}m`;
+}
+
+function syntheticWeather(levelCode) {
+  const weatherByLevel = {
+    L: { wind: 11.4, gust: 16.0, rain: 0.00, snow: 0.00, reasons: ["All conditions within Low thresholds"] },
+    M: { wind: 27.3, gust: 36.1, rain: 0.04, snow: 0.00, reasons: ["Wind 27.3 mph → Moderate"] },
+    H: { wind: 18.2, gust: 27.5, rain: 0.31, snow: 0.00, reasons: ["Rain 0.31 in/hr → High"] },
+    S: { wind: 38.6, gust: 52.4, rain: 0.12, snow: 0.00, reasons: ["Wind 38.6 mph with 42,000 lb load → Severe", "Wind 38.6 mph → High", "Rain 0.12 in/hr → Moderate"] },
+    N: { wind: 47.9, gust: 63.0, rain: 0.08, snow: 0.20, reasons: ["Wind 47.9 mph with 42,000 lb load → No Travel", "Wind 47.9 mph → Severe"] },
+  };
+  return weatherByLevel[levelCode];
+}
+
+function buildRoutes() {
+  const routesLayer = element("routes");
+  const trucksLayer = element("trucks");
+  routesLayer.replaceChildren();
+  trucksLayer.replaceChildren();
+  const drawingOrder = [...ROUTES].sort((first, second) => (first.id === RECOMMENDED_ROUTE_ID) - (second.id === RECOMMENDED_ROUTE_ID));
+  drawingOrder.forEach((route, drawIndex) => {
+    const isRecommended = route.id === RECOMMENDED_ROUTE_ID;
+    const lineWidth = isRecommended ? 7 : 5;
+    const group = createSvg("g", { class: "route-group", "data-route": route.id });
+    const measurePath = createSvg("path", { d: route.path });
+    group.append(measurePath);
+    routesLayer.append(group);
+    route.measurePath = measurePath;
+    measurePath.setAttribute("fill", "none");
+
+    const casing = createSvg("path", { d: route.path, class: "route-casing route-draw", "stroke-width": lineWidth + 5, pathLength: 1 });
+    casing.style.animationDelay = `${drawIndex * 0.15}s`;
+    group.append(casing);
+
+    const segments = createSvg("g", { class: "fade-in" });
+    segments.style.animationDelay = `${0.5 + drawIndex * 0.15}s`;
+    const fractions = checkpointFractions(route);
+    fractions.forEach((fraction, index) => {
+      const start = index === 0 ? 0 : (fractions[index - 1] + fraction) / 2;
+      const end = index === fractions.length - 1 ? 1 : (fraction + fractions[index + 1]) / 2;
+      if (end <= start) return;
+      segments.append(createSvg("path", {
+        d: segmentPathData(measurePath, start, end),
+        class: "route-segment",
+        stroke: RISK_LEVELS[levelAt(route, fraction)].color,
+        "stroke-width": lineWidth,
+      }));
+    });
+    group.append(segments);
+
+    const hitArea = createSvg("path", { d: route.path, class: "route-hit" });
+    hitArea.addEventListener("mouseenter", () => setHoveredRoute(route.id));
+    hitArea.addEventListener("mouseleave", () => setHoveredRoute(null));
+    hitArea.addEventListener("click", () => selectRoute(route.id));
+    group.append(hitArea);
+
+    const checkpoints = createSvg("g", { class: "checkpoints fade-in" });
+    checkpoints.style.animationDelay = `${0.8 + drawIndex * 0.15}s`;
+    fractions.forEach((fraction, index) => {
+      const point = measurePath.getPointAtLength(fraction * measurePath.getTotalLength());
+      const levelCode = levelAt(route, fraction);
+      const marker = createSvg("circle", {
+        cx: point.x, cy: point.y, r: isRecommended ? 5.5 : 4.5,
+        class: "checkpoint", fill: RISK_LEVELS[levelCode].color,
+      });
+      marker.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openCheckpoint(route, index, fraction, levelCode);
+      });
+      checkpoints.append(marker);
+    });
+    group.append(checkpoints);
+    route.group = group;
+
+    const truck = createSvg("g", { class: "truck", "data-route": route.id });
+    truck.append(createSvg("circle", { r: 9, class: "truck-pulse" }));
+    truck.append(createSvg("circle", { r: 11, class: "truck-body" }));
+    truck.append(createSvg("path", { d: "M-4 -5 L6 0 L-4 5 Z", class: "truck-arrow" }));
+    trucksLayer.append(truck);
+    route.truck = truck;
+  });
+}
+
+function buildHeat() {
+  const heatLayer = element("heat");
+  STORM_CELLS.forEach((cell) => {
+    cell.blobs = STORM_SATELLITES.map(() => {
+      const blob = createSvg("circle", { fill: "url(#radar-gradient)" });
+      heatLayer.append(blob);
+      return blob;
+    });
+  });
+}
+
+function renderHeat(hour) {
+  STORM_CELLS.forEach((cell, cellIndex) => {
+    const strength = cell.intensity * Math.exp(-(((hour - cell.peakHour) / cell.spreadHours) ** 2));
+    const centerX = cell.x + cell.vx * hour;
+    const centerY = cell.y + cell.vy * hour;
+    const rotation = hour * 0.08 + cellIndex;
+    cell.blobs.forEach((blob, blobIndex) => {
+      const [offsetX, offsetY, scale] = STORM_SATELLITES[blobIndex];
+      const rotatedX = offsetX * Math.cos(rotation) - offsetY * Math.sin(rotation);
+      const rotatedY = offsetX * Math.sin(rotation) + offsetY * Math.cos(rotation);
+      blob.setAttribute("cx", (centerX + rotatedX * cell.radius).toFixed(1));
+      blob.setAttribute("cy", (centerY + rotatedY * cell.radius).toFixed(1));
+      blob.setAttribute("r", (cell.radius * scale * (0.55 + 0.45 * strength)).toFixed(1));
+      blob.setAttribute("opacity", Math.min(1, strength * 1.15).toFixed(3));
+    });
+  });
+}
+
+function renderTrucks(hour) {
+  ROUTES.forEach((route) => {
+    const path = route.measurePath;
+    const totalLength = path.getTotalLength();
+    const progress = Math.min(1, hour / route.hours);
+    const position = path.getPointAtLength(progress * totalLength);
+    const ahead = path.getPointAtLength(Math.min(totalLength, progress * totalLength + 2));
+    const behind = path.getPointAtLength(Math.max(0, progress * totalLength - 2));
+    const headingDegrees = Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * 180 / Math.PI;
+    route.truck.setAttribute("transform", `translate(${position.x.toFixed(1)} ${position.y.toFixed(1)}) rotate(${headingDegrees.toFixed(1)})`);
+    route.truck.style.opacity = progress >= 1 ? 0.45 : 1;
+  });
+}
+
+function renderRouteEmphasis() {
+  const focusedRouteId = state.hoveredRouteId ?? state.selectedRouteId;
+  ROUTES.forEach((route) => {
+    const isFocused = route.id === focusedRouteId;
+    const isAlternate = route.id !== RECOMMENDED_ROUTE_ID;
+    route.group.classList.toggle("dimmed", !isFocused);
+    route.group.classList.toggle("hidden", isAlternate && !state.layers.alternates && !isFocused);
+    route.truck.style.display = route.group.classList.contains("hidden") ? "none" : "";
+    if (isFocused && route.group.parentNode.lastElementChild !== route.group) route.group.parentNode.append(route.group);
+    route.group.querySelector(".checkpoints").classList.toggle("hidden", !state.layers.checkpoints);
+  });
+  document.querySelectorAll(".route-strip").forEach((strip) => {
+    strip.classList.toggle("selected", strip.dataset.route === state.selectedRouteId);
+  });
+}
+
+function setHoveredRoute(routeId) {
+  state.hoveredRouteId = routeId;
+  renderRouteEmphasis();
+}
+
+function selectRoute(routeId) {
+  state.selectedRouteId = routeId;
+  renderRouteEmphasis();
+}
+
+function buildRouteList() {
+  const list = element("route-list");
+  list.replaceChildren();
+  ROUTES.forEach((route) => {
+    const isRecommended = route.id === RECOMMENDED_ROUTE_ID;
+    const fractions = checkpointFractions(route);
+    const strip = document.createElement("article");
+    strip.className = `route-strip${isRecommended ? " recommended" : ""}`;
+    strip.dataset.route = route.id;
+    strip.style.setProperty("--strip-color", isRecommended ? "var(--accent)" : route.noTravelMiles ? RISK_LEVELS.N.color : RISK_LEVELS.S.color);
+    const badge = isRecommended
+      ? '<span class="badge recommended">Recommended</span>'
+      : route.noTravelMiles ? '<span class="badge danger">No Travel</span>' : "";
+    strip.innerHTML = `
+      <div class="strip-top">
+        <div class="route-letter">${route.id}</div>
+        <div><div class="route-via">${route.via}</div><div class="route-provider">${route.provider}</div></div>
+        ${badge}
+      </div>
+      <div class="strip-stats">
+        <div><div class="stat-value mono">${route.miles}</div><div class="stat-caption">miles</div></div>
+        <div><div class="stat-value mono">${formatDuration(route.hours)}</div><div class="stat-caption">drive</div></div>
+        <div><div class="stat-value mono" style="color:${route.severeMiles ? RISK_LEVELS.S.color : "inherit"}">${route.severeMiles + route.noTravelMiles}</div><div class="stat-caption">sev+ mi</div></div>
+        <div><div class="stat-value mono">${route.averageRisk.toFixed(2)}</div><div class="stat-caption">avg risk</div></div>
+      </div>
+      <div class="risk-ribbon" aria-label="Risk along route">${fractions.map((fraction) => `<i style="background:${RISK_LEVELS[levelAt(route, fraction)].color}"></i>`).join("")}</div>
+      <div class="strip-reason">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="10"/></svg>
+        <span>${route.reason}</span>
+      </div>`;
+    strip.addEventListener("mouseenter", () => setHoveredRoute(route.id));
+    strip.addEventListener("mouseleave", () => setHoveredRoute(null));
+    strip.addEventListener("click", () => selectRoute(route.id));
+    list.append(strip);
+  });
+}
+
+function openCheckpoint(route, index, fraction, levelCode) {
+  const level = RISK_LEVELS[levelCode];
+  const weather = syntheticWeather(levelCode);
+  const etaHours = fraction * route.hours;
+  element("drawer-title").textContent = `Route ${route.id} · Checkpoint ${index + 1}`;
+  element("drawer-subtitle").textContent = `mile ${Math.round(fraction * route.miles)} · ETA ${formatClock(etaHours)} (+${etaHours.toFixed(1)} h)`;
+  element("drawer-level").innerHTML = `<span class="level-pill" style="color:${level.color};background:${level.color}22">● ${level.label}</span>`;
+  element("drawer-weather").innerHTML = [
+    ["Wind", `${weather.wind.toFixed(1)}`, "mph"],
+    ["Gust", `${weather.gust.toFixed(1)}`, "mph"],
+    ["Rain", weather.rain.toFixed(2), "in/hr"],
+    ["Snow", weather.snow.toFixed(2), "in/hr"],
+  ].map(([caption, value, unit]) => `<div class="weather-cell"><div class="stat-caption">${caption}</div><div class="stat-value mono">${value} <small style="font-size:11px;color:var(--muted)">${unit}</small></div></div>`).join("");
+  element("drawer-reasons").innerHTML = weather.reasons.map((reason) => `<li style="--reason-color:${level.color}">${reason}</li>`).join("");
+  element("drawer").classList.add("open");
+  selectRoute(route.id);
+}
+
+function buildScrubber() {
+  const track = element("scrubber-track");
+  const scrubber = element("scrubber");
+  const percent = (hour) => `${(hour / 48) * 100}%`;
+  for (let hour = 0; hour <= 48; hour += 1) {
+    const localHour = (DEPARTURE_LOCAL_HOUR + hour) % 24;
+    if (localHour === 18 || (hour === 0 && localHour < 6)) {
+      const band = document.createElement("div");
+      band.className = "night-band";
+      band.style.left = percent(hour);
+      band.style.width = percent(Math.min(12, 48 - hour));
+      track.append(band);
+    }
+    const tick = document.createElement("div");
+    const isMajor = hour % 6 === 0;
+    tick.className = `tick${isMajor ? " major" : ""}`;
+    tick.style.left = percent(hour);
+    scrubber.append(tick);
+    if (isMajor) {
+      const label = document.createElement("div");
+      label.className = "tick-label";
+      label.style.left = percent(hour);
+      label.textContent = `+${hour}h`;
+      scrubber.append(label);
+    }
+    if (localHour === 0) {
+      const divider = document.createElement("div");
+      divider.className = "day-divider";
+      divider.style.left = percent(hour);
+      const dayLabel = document.createElement("div");
+      dayLabel.className = "day-label";
+      dayLabel.style.left = percent(hour);
+      dayLabel.textContent = WEEKDAYS[Math.floor((DEPARTURE_LOCAL_HOUR + hour) / 24)];
+      scrubber.append(divider, dayLabel);
+    }
+  }
+  const firstDay = document.createElement("div");
+  firstDay.className = "day-label";
+  firstDay.style.left = "0%";
+  firstDay.textContent = WEEKDAYS[0];
+  scrubber.append(firstDay);
+}
+
+function renderTimeline(hour) {
+  const percent = `${(hour / 48) * 100}%`;
+  element("scrubber-progress").style.width = percent;
+  element("scrubber-thumb").style.left = percent;
+  element("clock-time").textContent = formatClock(hour);
+  element("clock-offset").textContent = `+${hour.toFixed(1)} h`;
+  element("time-range").value = hour;
+}
+
+let pendingFrame = null;
+function setHour(hour) {
+  state.hour = Math.max(0, Math.min(48, hour));
+  if (pendingFrame) return;
+  pendingFrame = requestAnimationFrame(() => {
+    pendingFrame = null;
+    renderTimeline(state.hour);
+    renderHeat(state.hour);
+    renderTrucks(state.hour);
+  });
+}
+
+const PLAY_ICON = '<path d="M7 5v14l12-7z"/>';
+const PAUSE_ICON = '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>';
+let lastFrameTime = null;
+function playbackLoop(timestamp) {
+  if (!state.playing) return;
+  if (lastFrameTime !== null) {
+    const nextHour = state.hour + ((timestamp - lastFrameTime) / 1000) * state.speed;
+    setHour(nextHour >= 48 ? 0 : nextHour);
+  }
+  lastFrameTime = timestamp;
+  requestAnimationFrame(playbackLoop);
+}
+function togglePlayback() {
+  state.playing = !state.playing;
+  element("play-icon").innerHTML = state.playing ? PAUSE_ICON : PLAY_ICON;
+  element("play-button").setAttribute("aria-label", state.playing ? "Pause forecast" : "Play forecast");
+  lastFrameTime = null;
+  if (state.playing) requestAnimationFrame(playbackLoop);
+}
+
+function buildLegend() {
+  element("legend-items").innerHTML = Object.values(RISK_LEVELS)
+    .map((level) => `<span class="legend-item"><span class="legend-swatch" style="background:${level.color}"></span>${level.label}</span>`)
+    .join("");
+}
+
+function buildDepartureWindow() {
+  const averageRiskByDelay = [0.42, 0.40, 0.36, 0.31, 0.33, 0.38, 0.45];
+  const highest = Math.max(...averageRiskByDelay);
+  const bestDelay = averageRiskByDelay.indexOf(Math.min(...averageRiskByDelay));
+  element("window-bars").innerHTML = averageRiskByDelay
+    .map((risk, delay) => `<div class="window-bar${delay === bestDelay ? " best" : ""}" style="height:${(risk / highest) * 100}%" title="+${delay} h · avg ${risk.toFixed(2)}"></div>`)
+    .join("");
+  element("window-axis").innerHTML = averageRiskByDelay.map((_, delay) => `<span>+${delay}h</span>`).join("");
+}
+
+function renderLoadHint(loadPounds) {
+  element("load-value").innerHTML = `${loadPounds.toLocaleString("en-US")} <span>lb</span>`;
+  const hint = element("load-hint");
+  if (loadPounds > 40000) {
+    hint.innerHTML = "<strong>Heavy load rules active.</strong> 35–44 mph wind counts as Severe; 45–54 mph is No Travel.";
+  } else if (loadPounds > 30000) {
+    hint.innerHTML = "<strong>Load rule active.</strong> 45–54 mph wind counts as No Travel.";
+  } else {
+    hint.innerHTML = "<strong>Standard thresholds.</strong> Only wind ≥ 55 mph is No Travel.";
+  }
+}
+
+const SUN_ICON = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+const MOON_ICON = '<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>';
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  element("theme-icon").innerHTML = theme === "dark" ? SUN_ICON : MOON_ICON;
+}
+
+function showToast(message) {
+  const toast = element("toast");
+  toast.textContent = message;
+  toast.classList.add("visible");
+  setTimeout(() => toast.classList.remove("visible"), 1800);
+}
+
+function bindControls() {
+  element("time-range").addEventListener("input", (event) => setHour(Number(event.target.value)));
+  element("play-button").addEventListener("click", togglePlayback);
+  element("speed-toggle").addEventListener("click", (event) => {
+    const button = event.target.closest("button");
+    if (!button) return;
+    state.speed = Number(button.dataset.speed);
+    document.querySelectorAll("#speed-toggle button").forEach((item) => item.classList.toggle("active", item === button));
+  });
+  document.querySelectorAll("[data-layer]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const layerName = button.dataset.layer;
+      state.layers[layerName] = !state.layers[layerName];
+      button.classList.toggle("active", state.layers[layerName]);
+      element("heat").classList.toggle("hidden", !state.layers.heat);
+      renderRouteEmphasis();
+    });
+  });
+  element("drawer-close").addEventListener("click", () => element("drawer").classList.remove("open"));
+  element("theme-button").addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+  element("share-button").addEventListener("click", () => showToast("Share link copied to clipboard"));
+  element("map").addEventListener("click", () => showToast("Map click sets origin, then destination"));
+  element("load-range").addEventListener("input", (event) => renderLoadHint(Number(event.target.value)));
+  document.querySelectorAll("[data-load]").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      element("load-range").value = chip.dataset.load;
+      renderLoadHint(Number(chip.dataset.load));
+    });
+  });
+  document.querySelectorAll(".segmented button").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".segmented button").forEach((item) => item.classList.toggle("active", item === button));
+    });
+  });
+  element("plan-button").addEventListener("click", () => {
+    const planButton = element("plan-button");
+    planButton.classList.add("loading");
+    setTimeout(() => {
+      planButton.classList.remove("loading");
+      buildRoutes();
+      renderRouteEmphasis();
+      renderTrucks(state.hour);
+      showToast("3 routes planned · weather sampled at 104 checkpoints");
+    }, 900);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.target.matches("input:not([type=range])")) return;
+    if (event.code === "Space") { event.preventDefault(); togglePlayback(); }
+    if (event.code === "ArrowRight") setHour(Math.floor(state.hour) + 1);
+    if (event.code === "ArrowLeft") setHour(Math.ceil(state.hour) - 1);
+    if (event.code === "Escape") element("drawer").classList.remove("open");
+  });
+}
+
+applyTheme(window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+element("play-icon").innerHTML = PLAY_ICON;
+buildHeat();
+buildRoutes();
+buildRouteList();
+buildScrubber();
+buildLegend();
+buildDepartureWindow();
+renderLoadHint(LOAD_POUNDS);
+renderRouteEmphasis();
+bindControls();
+setHour(3);
+</script>
+</body>
+</html>

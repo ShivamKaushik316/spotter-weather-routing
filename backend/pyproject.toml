@@ -1,0 +1,38 @@
+[project]
+name = "weather-aware-truck-routing-backend"
+version = "1.0.0"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "C4", "RET", "PT", "RUF", "DTZ"]
+
+[tool.ruff.lint.per-file-ignores]
+"config/test_settings.py" = ["F403", "F405"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = [
+    "trips/domain",
+    "core/exceptions.py",
+    "core/metrics.py",
+    "core/request_context.py",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.test_settings"
+pythonpath = ["."]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
+
+[tool.coverage.run]
+source = ["trips", "core"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

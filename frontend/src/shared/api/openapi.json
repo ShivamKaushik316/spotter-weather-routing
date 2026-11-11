@@ -1,0 +1,798 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Weather-Aware Truck Routing API",
+        "version": "1.0.0",
+        "description": "Plans truck routes, rates weather risk along them and recommends the safest."
+    },
+    "paths": {
+        "/api/geocode": {
+            "get": {
+                "operationId": "api_geocode_retrieve",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 10,
+                            "minimum": 1,
+                            "default": 5
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 200,
+                            "minLength": 2
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "api"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeocodeResultsResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/health": {
+            "get": {
+                "operationId": "api_health_retrieve",
+                "tags": [
+                    "api"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/trips/departure-window": {
+            "post": {
+                "operationId": "api_trips_departure_window_create",
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DepartureWindowRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DepartureWindowPlanResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/trips/heatmap": {
+            "post": {
+                "operationId": "api_trips_heatmap_create",
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HeatmapRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/trips/plan": {
+            "post": {
+                "operationId": "api_trips_plan_create",
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TripRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TripPlanResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Checkpoint": {
+                "type": "object",
+                "properties": {
+                    "sequence": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "distance_from_origin_miles": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "represented_miles": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "estimated_arrival": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "weather": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/WeatherConditions"
+                            }
+                        ],
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "risk_level": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RiskLevelLabel"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Null when the forecast is unavailable.",
+                        "readOnly": true
+                    },
+                    "risk_score": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "risk_reasons": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "distance_from_origin_miles",
+                    "estimated_arrival",
+                    "latitude",
+                    "longitude",
+                    "represented_miles",
+                    "risk_level",
+                    "risk_reasons",
+                    "risk_score",
+                    "sequence",
+                    "weather"
+                ]
+            },
+            "CoordinateInput": {
+                "type": "object",
+                "properties": {
+                    "latitude": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 90,
+                        "minimum": -90
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 180,
+                        "minimum": -180
+                    }
+                },
+                "required": [
+                    "latitude",
+                    "longitude"
+                ]
+            },
+            "DepartureOption": {
+                "type": "object",
+                "properties": {
+                    "departure": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "delay_hours": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "best_route_id": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "summary": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RouteSummary"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "change_from_baseline": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "best_route_id",
+                    "change_from_baseline",
+                    "delay_hours",
+                    "departure",
+                    "summary"
+                ]
+            },
+            "DepartureWindowPlanResponse": {
+                "type": "object",
+                "properties": {
+                    "baseline": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DepartureOption"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "recommended_option": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DepartureOption"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "options": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DepartureOption"
+                        },
+                        "readOnly": true
+                    },
+                    "meta": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponseMeta"
+                            }
+                        ],
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "baseline",
+                    "meta",
+                    "options",
+                    "recommended_option"
+                ]
+            },
+            "DepartureWindowRequest": {
+                "type": "object",
+                "properties": {
+                    "origin": {
+                        "$ref": "#/components/schemas/CoordinateInput"
+                    },
+                    "destination": {
+                        "$ref": "#/components/schemas/CoordinateInput"
+                    },
+                    "departure": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "load_pounds": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 80000,
+                        "minimum": 0
+                    },
+                    "interval_miles": {
+                        "$ref": "#/components/schemas/IntervalMilesEnum"
+                    },
+                    "window_hours": {
+                        "type": "integer",
+                        "maximum": 24,
+                        "minimum": 1,
+                        "default": 12
+                    },
+                    "option_limit": {
+                        "type": "integer",
+                        "maximum": 10,
+                        "minimum": 1,
+                        "default": 5
+                    }
+                },
+                "required": [
+                    "departure",
+                    "destination",
+                    "interval_miles",
+                    "load_pounds",
+                    "origin"
+                ]
+            },
+            "GeocodeResultsResponse": {
+                "type": "object",
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Place"
+                        },
+                        "readOnly": true
+                    },
+                    "meta": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponseMeta"
+                            }
+                        ],
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "meta",
+                    "results"
+                ]
+            },
+            "HeatmapRequest": {
+                "type": "object",
+                "properties": {
+                    "routes": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "minItems": 2,
+                            "items": {
+                                "type": "array",
+                                "minItems": 2,
+                                "maxItems": 2,
+                                "items": {
+                                    "type": "number"
+                                }
+                            },
+                            "description": "GeoJSON LineString coordinates as [longitude, latitude] pairs."
+                        },
+                        "maxItems": 5,
+                        "minItems": 1
+                    },
+                    "departure": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "load_pounds": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 80000,
+                        "minimum": 0
+                    }
+                },
+                "required": [
+                    "departure",
+                    "load_pounds",
+                    "routes"
+                ]
+            },
+            "IntervalMilesEnum": {
+                "enum": [
+                    10,
+                    25,
+                    50
+                ],
+                "type": "integer",
+                "description": "* `10` - 10\n* `25` - 25\n* `50` - 50"
+            },
+            "Place": {
+                "type": "object",
+                "properties": {
+                    "label": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "label",
+                    "latitude",
+                    "longitude"
+                ]
+            },
+            "ResponseMeta": {
+                "type": "object",
+                "properties": {
+                    "request_id": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "timings_ms": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "number",
+                            "format": "double"
+                        },
+                        "readOnly": true
+                    },
+                    "counters": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer"
+                        },
+                        "readOnly": true
+                    },
+                    "labels": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "counters",
+                    "labels",
+                    "request_id",
+                    "timings_ms"
+                ]
+            },
+            "RiskLevelLabel": {
+                "type": "string",
+                "enum": [
+                    "Low",
+                    "Moderate",
+                    "High",
+                    "Severe",
+                    "No Travel"
+                ]
+            },
+            "Route": {
+                "type": "object",
+                "properties": {
+                    "route_id": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "provider": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "travel_profile": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/TravelProfileEnum"
+                            }
+                        ],
+                        "readOnly": true,
+                        "description": "truck: routed with a truck profile. car_adjusted_for_truck: car route whose durations were scaled to truck speeds.\n\n* `truck` - truck\n* `car_adjusted_for_truck` - car_adjusted_for_truck"
+                    },
+                    "geometry": {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "coordinates"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "LineString"
+                                ]
+                            },
+                            "coordinates": {
+                                "type": "array",
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        },
+                        "readOnly": true
+                    },
+                    "summary": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RouteSummary"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "checkpoints": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Checkpoint"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "checkpoints",
+                    "geometry",
+                    "provider",
+                    "route_id",
+                    "summary",
+                    "travel_profile"
+                ]
+            },
+            "RouteSummary": {
+                "type": "object",
+                "properties": {
+                    "distance_miles": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "duration_seconds": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "miles_by_level": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "number"
+                        },
+                        "readOnly": true
+                    },
+                    "unknown_miles": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "average_risk_score": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "highest_risk_level": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RiskLevelLabel"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Null when the forecast is unavailable.",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "average_risk_score",
+                    "distance_miles",
+                    "duration_seconds",
+                    "highest_risk_level",
+                    "miles_by_level",
+                    "unknown_miles"
+                ]
+            },
+            "TravelProfileEnum": {
+                "enum": [
+                    "truck",
+                    "car_adjusted_for_truck"
+                ],
+                "type": "string",
+                "description": "* `truck` - truck\n* `car_adjusted_for_truck` - car_adjusted_for_truck"
+            },
+            "TripPlanResponse": {
+                "type": "object",
+                "properties": {
+                    "departure": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "load_pounds": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "interval_miles": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "recommended_route_id": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "recommendation_reason": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "readOnly": true
+                    },
+                    "routes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Route"
+                        },
+                        "readOnly": true
+                    },
+                    "meta": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponseMeta"
+                            }
+                        ],
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "departure",
+                    "interval_miles",
+                    "load_pounds",
+                    "meta",
+                    "recommendation_reason",
+                    "recommended_route_id",
+                    "routes",
+                    "warnings"
+                ]
+            },
+            "TripRequest": {
+                "type": "object",
+                "properties": {
+                    "origin": {
+                        "$ref": "#/components/schemas/CoordinateInput"
+                    },
+                    "destination": {
+                        "$ref": "#/components/schemas/CoordinateInput"
+                    },
+                    "departure": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "load_pounds": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 80000,
+                        "minimum": 0
+                    },
+                    "interval_miles": {
+                        "$ref": "#/components/schemas/IntervalMilesEnum"
+                    }
+                },
+                "required": [
+                    "departure",
+                    "destination",
+                    "interval_miles",
+                    "load_pounds",
+                    "origin"
+                ]
+            },
+            "WeatherConditions": {
+                "type": "object",
+                "properties": {
+                    "wind_speed_mph": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "wind_gust_mph": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "rain_inches_per_hour": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    },
+                    "snowfall_inches_per_hour": {
+                        "type": "number",
+                        "format": "double",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "rain_inches_per_hour",
+                    "snowfall_inches_per_hour",
+                    "wind_gust_mph",
+                    "wind_speed_mph"
+                ]
+            }
+        }
+    }
+}
