@@ -3,7 +3,7 @@
 Plan a truck trip, see the weather the truck will **actually** meet at every point **at the time it gets there**, and get the safest of three routes — with the reason why.
 
 - **Stack:** React 18 · TypeScript (strict) · Vite · MapLibre GL · TanStack Query · Zustand · Tailwind — Django 5 · DRF · drf-spectacular · httpx
-- **Live demo:** _to be added_
+- **Live demo:** <https://spotter-weather-routing-coral.vercel.app> (Swagger UI: <https://spotter-weather-routing-coral.vercel.app/api/docs>)
 - **Walkthrough video:** _to be added_
 
 ---
