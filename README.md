@@ -82,7 +82,18 @@ Set `PROVIDER_MODE=stub` in `backend/.env`. Routing, geocoding and weather are t
 docker compose up --build
 ```
 
-### 2.5 Production build
+### 2.5 Single-container deploy (frontend + backend)
+
+The root `Dockerfile` builds the frontend with Node, then serves it from Django through WhiteNoise. The UI and `/api` share one origin, so no CORS setup and no `VITE_API_BASE_URL` are needed.
+
+```bash
+docker build -t night-dispatch .
+docker run -p 8000:8000 --env-file backend/.env night-dispatch      # http://localhost:8000
+```
+
+The container listens on `$PORT` (default 8000), which matches what Render, Koyeb and similar hosts inject. Required env on the host: `OPENROUTESERVICE_API_KEY`, `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS=<your-domain>`, `DJANGO_DEBUG=false`.
+
+### 2.6 Production build (separate hosting)
 
 ```bash
 cd frontend

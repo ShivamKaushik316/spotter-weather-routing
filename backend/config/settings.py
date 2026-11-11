@@ -31,6 +31,7 @@ MIDDLEWARE = [
     "core.middleware.AccessLogMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.common.CommonMiddleware",
 ]
 
@@ -54,6 +55,12 @@ TIME_ZONE = "UTC"
 USE_I18N = False
 USE_TZ = True
 STATIC_URL = "static/"
+
+FRONTEND_DIST_DIR = Path(env.str("FRONTEND_DIST_DIR", default=str(BASE_DIR / "frontend_dist")))
+WHITENOISE_ROOT = FRONTEND_DIST_DIR if FRONTEND_DIST_DIR.is_dir() else None
+WHITENOISE_INDEX_FILE = True
+VITE_HASHED_ASSET_PATTERN = r"^/assets/.+-[0-9A-Za-z_-]{8,}\.\w+$"
+WHITENOISE_IMMUTABLE_FILE_TEST = VITE_HASHED_ASSET_PATTERN
 
 REDIS_URL = env.str("REDIS_URL", default="")
 LOCAL_MEMORY_CACHE_MAX_ENTRIES = env.int("LOCAL_MEMORY_CACHE_MAX_ENTRIES", default=200_000)
