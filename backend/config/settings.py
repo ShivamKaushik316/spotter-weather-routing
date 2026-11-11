@@ -14,7 +14,14 @@ if ENV_FILE_PATH.exists():
 
 DEBUG = env.bool("DJANGO_DEBUG", default=False)
 SECRET_KEY = env.str("DJANGO_SECRET_KEY", default="development-only-secret-key")
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+VERCEL_HOSTNAME_VARIABLES = ("VERCEL_URL", "VERCEL_BRANCH_URL", "VERCEL_PROJECT_PRODUCTION_URL")
+VERCEL_HOSTNAMES = [
+    env.str(name) for name in VERCEL_HOSTNAME_VARIABLES if env.str(name, default="")
+]
+ALLOWED_HOSTS = [
+    *env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"]),
+    *VERCEL_HOSTNAMES,
+]
 
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
