@@ -7,9 +7,9 @@ Format: each section has **On screen** (what to show) and **Say** (what to speak
 
 ## Before you hit record
 
-- [ ] Backend running: `cd backend; .venv\Scripts\python manage.py runserver 127.0.0.1:8000`
-- [ ] Frontend running: `cd frontend; npx vite --port 5173`, open `http://localhost:5173`
-- [ ] Plan **Chicago → St. Louis** once before recording so the weather cache is warm (live plan takes ~8 s cold).
+- [ ] Demo on the hosted app: <https://spotter-weather-routing-coral.vercel.app>
+- [ ] Plan **Chicago → St. Louis** and **Denver → Dallas** once before recording so the first request is not a cold start.
+- [ ] Keep the GitHub repo open in a second tab: <https://github.com/ShivamKaushik316/spotter-weather-routing>
 - [ ] **Never open `backend/.env` on screen** — it contains the OpenRouteService API key.
 - [ ] Close extra tabs, turn on Do Not Disturb, set browser zoom to 100%.
 - [ ] Keep VS Code open with these files ready in tabs:
@@ -23,7 +23,7 @@ Format: each section has **On screen** (what to show) and **Say** (what to speak
 
 ## 0:00 – 0:30 · Intro
 
-**On screen:** App home page, dark theme, empty map.
+**On screen:** Hosted app home page, dark theme, empty map. Show the URL bar briefly.
 
 **Say:**
 > Hi, I'm Shivam. This is my submission for the Spotter full-stack assessment — a weather-aware truck routing app. You give it an origin, a destination, a departure time and the load weight. It builds three candidate routes, forecasts the weather each truck will actually hit at the time it gets there, scores every stretch with the assessment's risk rules, and recommends the safest route. Stack is React with TypeScript on the front, Django REST on the back.
@@ -100,7 +100,7 @@ Format: each section has **On screen** (what to show) and **Say** (what to speak
 **Do:** Open `backend/trips/domain/ranking.py`.
 
 **Say:**
-> Ranking is a list of criteria compared in order: No Travel miles first, then Severe miles, then High miles, then average risk, and travel time only as the final tie-breaker. The first criterion that separates two routes also produces the human-readable reason you saw in the UI.
+> Ranking is a list of criteria compared in order, exactly as the brief asks: fewest Severe miles, then fewest High miles, then lowest average risk, then shortest travel time. I added one criterion in front of those — fewest No Travel miles — because a No Travel stretch is worse than a Severe one, and the brief's list doesn't mention it. The first criterion that separates two routes also produces the human-readable reason you saw in the UI.
 
 **Say (sampling + time):**
 > The key correctness point: weather is not "now". For every checkpoint I compute the ETA from departure plus the cumulative drive time, then interpolate the hourly forecast at that exact ETA, all in UTC. Routes that overlap more than 80% are treated as duplicates and replaced, so you really get three different options.
@@ -146,6 +146,8 @@ Format: each section has **On screen** (what to show) and **Say** (what to speak
 **On screen:** Back to the app, slider at a point with visible weather.
 
 **Say:**
+> It's deployed on Vercel as two services on one domain — the Vite frontend and the Django API under `/api` — and the code is on GitHub with full setup and architecture docs in the README.
+>
 > That's the project — a truck routing app whose recommendation is based on weather at the time and place the truck will actually be. Thanks for watching, and I'd love to walk through any part in more detail.
 
 ---
